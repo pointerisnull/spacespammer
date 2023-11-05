@@ -12,7 +12,7 @@ State state;
 void init(Lot *lots, int spaceCount) {
   state.RUNNING = 1;
   for(int i = 0; i < state.lotCount; i++) {
-    lots[i].spaceCount = rand() % 50 + 1;//255;
+    lots[i].spaceCount = spaceCount;
     lots[i].id = i;
     strncpy(lots[i].name, "default", 8);
     lots[i].space = malloc(sizeof(Space)*lots[i].spaceCount);
@@ -27,17 +27,6 @@ void init(Lot *lots, int spaceCount) {
 
 int main(int argc, char *argv[]) {
 
-  int YCPlotcount = 1;
-  state.lotCount = YCPlotcount;
-  Lot *YCPlots = malloc(sizeof(Lot)*state.lotCount);
-  init(YCPlots, 6);
-
-  for(int i = 0; i < state.lotCount; i++) {
-    makeInitPacket("init.JSON", 0, YCPlots[i]);
-    sendPacket("init.JSON", "/api/new/lot", 0);
-    sendPacket("init.JSON", "/api/update/lot", 0);
-  } 
-
   int airportlotcount = 2;
   state.lotCount = airportlotcount;
   Lot *airport = malloc(sizeof(Lot)*state.lotCount);
@@ -45,7 +34,7 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < state.lotCount; i++) {
     makeInitPacket("init.JSON", 1, airport[i]);
     sendPacket("init.JSON", "/api/new/lot", 1);
-    sendPacket("init.JSON", "/api/update/lot", 0);
+    sendPacket("init.JSON", "/api/update/lot", 1);
   } 
 
   int wallmartcount = 3;
@@ -68,34 +57,14 @@ int main(int argc, char *argv[]) {
     sendPacket("init.JSON", "/api/update/lot", 3);
   } 
 
-
-  int threecarcount = 3;
-  state.lotCount = threecarcount;
-  Lot *threecar = malloc(sizeof(Lot)*state.lotCount);
-  init(threecar, 40);
-  for(int i = 0; i < state.lotCount; i++) {
-    makeInitPacket("init.JSON", 4, threecar[i]);
-    sendPacket("init.JSON", "/api/new/lot", 4);
-    sendPacket("init.JSON", "/api/update/lot", 4);
-  } 
-
   long long lastTime = time(NULL);
   long long thisTime;
   while(state.RUNNING) {
   thisTime = time(NULL);
-  if(thisTime - lastTime > 5) {
+  if(thisTime - lastTime > 3) {
     //printf("test\n", 0); 
-    int l = rand()%YCPlotcount;
-    int s = rand()%YCPlots[l].spaceCount;
-    makeUpdatePacket("update.JSON", 0, 1, l, s, YCPlots[l].space[s].popularity, YCPlots[l].space[s].timeTaken);
-    sendPacket("update.JSON" ,"/api/update/space", 0);
-    l = rand()%YCPlotcount;
-    s = rand()%YCPlots[l].spaceCount;
-    makeUpdatePacket("update.JSON", 0, 0, l, s, YCPlots[l].space[s].popularity, YCPlots[l].space[s].timeTaken);
-    sendPacket("update.JSON" ,"/api/update/space", 0);
-
-    l = rand()%airportlotcount;
-    s = rand()%airport[l].spaceCount;
+    int l = rand()%airportlotcount;
+    int s = rand()%airport[l].spaceCount;
     makeUpdatePacket("update.JSON", 1, 1, l, s, airport[l].space[s].popularity, airport[l].space[s].timeTaken);
     sendPacket("update.JSON" ,"/api/update/space", 1);
     l = rand()%airportlotcount;
@@ -120,9 +89,6 @@ int main(int argc, char *argv[]) {
     s = rand()%city[l].spaceCount;
     makeUpdatePacket("update.JSON", 3, 0, l, s, city[l].space[s].popularity, city[l].space[s].timeTaken);
     sendPacket("update.JSON" ,"/api/update/space", 3);
-
-
-
 
     lastTime = thisTime;
     }
