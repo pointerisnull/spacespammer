@@ -1,2 +1,2 @@
 compile:
-	gcc main.c net.c -o spotspammer -Wall 
+	gcc main.c net.c -o spacespammer -Wall 
